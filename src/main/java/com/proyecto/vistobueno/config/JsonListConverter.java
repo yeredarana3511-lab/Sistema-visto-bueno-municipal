@@ -1,4 +1,4 @@
-package com.sistema.vistobueno.config;
+package com.proyecto.vistobueno.config;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

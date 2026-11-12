@@ -1,7 +1,7 @@
-package com.sistema.vistobueno.service;
+package com.proyecto.vistobueno.service;
 
-import com.sistema.vistobueno.model.Usuario;
-import com.sistema.vistobueno.repository.UsuarioRepository;
+import com.proyecto.vistobueno.model.UsuarioSistema;
+import com.proyecto.vistobueno.repository.UsuarioSistemaRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,15 +11,15 @@ import java.util.Optional;
 @Service
 public class UsuarioService {
 
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioSistemaRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioSistemaRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<Usuario> buscarUsuarios(String filtro, Boolean activo) {
+    public List<UsuarioSistema> buscarUsuarios(String filtro, Boolean activo) {
         if ((filtro == null || filtro.isBlank()) && activo == null) {
             return usuarioRepository.findAll();
         }
@@ -27,16 +27,14 @@ public class UsuarioService {
         return usuarioRepository.buscarConFiltro(busqueda, activo);
     }
 
-    public Optional<Usuario> buscarPorId(Long id) {
+    public Optional<UsuarioSistema> buscarPorId(Long id) {
         return usuarioRepository.findById(id);
     }
 
-    public void guardar(Usuario usuario, String rawPassword) {
+    public void guardar(UsuarioSistema usuario, String rawPassword) {
         if (rawPassword != null && !rawPassword.isBlank()) {
             usuario.setPasswordHash(passwordEncoder.encode(rawPassword.trim()));
         } else if (usuario.getId() != null) {
-            // Edición de usuario sin cambio de contraseña:
-            // Recuperar el hash existente de la base de datos para no sobreescribirlo
             usuarioRepository.findById(usuario.getId()).ifPresent(existente -> {
                 usuario.setPasswordHash(existente.getPasswordHash());
             });

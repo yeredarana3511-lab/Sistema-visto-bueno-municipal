@@ -1,6 +1,6 @@
-package com.sistema.vistobueno.model;
+package com.proyecto.vistobueno.model;
 
-import com.sistema.vistobueno.config.JsonListConverter;
+import com.proyecto.vistobueno.config.JsonListConverter;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,6 @@ public class Rol {
 
     public Rol() {}
 
-    // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getClave() { return clave; }

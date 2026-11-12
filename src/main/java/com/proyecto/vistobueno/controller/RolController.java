@@ -1,7 +1,7 @@
-package com.sistema.vistobueno.controller;
+package com.proyecto.vistobueno.controller;
 
-import com.sistema.vistobueno.model.Rol;
-import com.sistema.vistobueno.service.RolService;
+import com.proyecto.vistobueno.model.Rol;
+import com.proyecto.vistobueno.service.RolService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;

@@ -1,6 +1,6 @@
-package com.sistema.vistobueno.repository;
+package com.proyecto.vistobueno.repository;
 
-import com.sistema.vistobueno.model.Rol;
+import com.proyecto.vistobueno.model.Rol;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

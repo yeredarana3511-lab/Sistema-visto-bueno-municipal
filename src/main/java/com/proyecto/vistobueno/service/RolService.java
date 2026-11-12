@@ -1,7 +1,7 @@
-package com.sistema.vistobueno.service;
+package com.proyecto.vistobueno.service;
 
-import com.sistema.vistobueno.model.Rol;
-import com.sistema.vistobueno.repository.RolRepository;
+import com.proyecto.vistobueno.model.Rol;
+import com.proyecto.vistobueno.repository.RolRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

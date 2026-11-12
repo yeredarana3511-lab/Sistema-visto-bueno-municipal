@@ -1,8 +1,8 @@
-package com.sistema.vistobueno.controller;
+package com.proyecto.vistobueno.controller;
 
-import com.sistema.vistobueno.model.Usuario;
-import com.sistema.vistobueno.service.RolService;
-import com.sistema.vistobueno.service.UsuarioService;
+import com.proyecto.vistobueno.model.UsuarioSistema;
+import com.proyecto.vistobueno.service.RolService;
+import com.proyecto.vistobueno.service.UsuarioService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -32,21 +32,21 @@ public class UsuarioController {
 
     @GetMapping("/nuevo")
     public String formularioNuevo(Model model) {
-        model.addAttribute("usuario", new Usuario());
+        model.addAttribute("usuario", new UsuarioSistema());
         model.addAttribute("roles", rolService.listarTodos());
         return "usuarios/formulario";
     }
 
     @GetMapping("/editar/{id}")
     public String formularioEditar(@PathVariable("id") Long id, Model model) {
-        Usuario usuario = usuarioService.buscarPorId(id).orElseThrow();
+        UsuarioSistema usuario = usuarioService.buscarPorId(id).orElseThrow();
         model.addAttribute("usuario", usuario);
         model.addAttribute("roles", rolService.listarTodos());
         return "usuarios/formulario";
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute("usuario") Usuario usuario, @RequestParam(name = "password", required = false) String password) {
+    public String guardar(@ModelAttribute("usuario") UsuarioSistema usuario, @RequestParam(name = "password", required = false) String password) {
         usuarioService.guardar(usuario, password);
         return "redirect:/usuarios";
     }

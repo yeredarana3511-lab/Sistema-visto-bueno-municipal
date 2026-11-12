@@ -1,7 +1,7 @@
-package com.sistema.vistobueno.controller;
+package com.proyecto.vistobueno.controller;
 
-import com.sistema.vistobueno.model.Usuario;
-import com.sistema.vistobueno.repository.UsuarioRepository;
+import com.proyecto.vistobueno.model.UsuarioSistema;
+import com.proyecto.vistobueno.repository.UsuarioSistemaRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,9 +12,9 @@ import java.util.Optional;
 @Controller
 public class LoginController {
 
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioSistemaRepository usuarioRepository;
 
-    public LoginController(UsuarioRepository usuarioRepository) {
+    public LoginController(UsuarioSistemaRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
     }
 
@@ -32,7 +32,7 @@ public class LoginController {
     public String inicio(Authentication authentication, Model model) {
         if (authentication != null) {
             String numeroEmpleado = authentication.getName();
-            Optional<Usuario> usuarioOpt = usuarioRepository.findByNumeroEmpleado(numeroEmpleado);
+            Optional<UsuarioSistema> usuarioOpt = usuarioRepository.findByNumeroEmpleado(numeroEmpleado);
             usuarioOpt.ifPresent(u -> model.addAttribute("usuarioActual", u));
         }
         return "inicio";

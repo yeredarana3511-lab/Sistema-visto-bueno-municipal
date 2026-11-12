@@ -1,6 +1,6 @@
-package com.sistema.vistobueno.config;
+package com.proyecto.vistobueno.config;
 
-import com.sistema.vistobueno.service.UserDetailsServiceImpl;
+import com.proyecto.vistobueno.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -37,24 +37,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Protección CSRF habilitada por defecto
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
-                        // Recursos estáticos públicos
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico", "/error").permitAll()
-                        // Acceso público a /login
                         .requestMatchers("/login", "/login?error", "/login?logout").permitAll()
-                        // Pantalla de Inicio accesible para cualquier usuario autenticado (Admin, Cajero, etc.)
                         .requestMatchers("/", "/inicio").authenticated()
-                        // Restricción de operaciones de gestión de usuarios y roles SOLO a Administradores
                         .requestMatchers("/usuarios/**", "/roles/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
-                        // Cualquier otra petición requiere autenticación
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        // Redirigir SIEMPRE a la pantalla de Inicio para ambos roles al iniciar sesión
                         .defaultSuccessUrl("/inicio", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
@@ -68,7 +61,6 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .exceptionHandling(ex -> ex
-                        // Si un rol no autorizado intenta entrar por URL directa a /usuarios, se le devuelve al inicio con aviso
                         .accessDeniedPage("/inicio?denegado=true")
                 );
 
