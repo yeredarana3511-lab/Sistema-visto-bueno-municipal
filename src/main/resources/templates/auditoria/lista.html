@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitácora de Auditoría - Visto Bueno Municipal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .header-banner {
+            background: linear-gradient(135deg, #1b3a57 0%, #0d6efd 100%);
+            color: white;
+            padding: 2rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 2rem;
+        }
+        .card-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #edf2f7;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container py-4">
+
+    <!-- Encabezado Principal y Navegación -->
+    <div class="header-banner">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h1 class="h3 mb-1">📜 Bitácora de Auditoría del Sistema</h1>
+                <p class="mb-0 text-white-50">Registro cronológico de operaciones, accesos y eventos de seguridad</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a th:href="@{/oficios}" class="btn btn-outline-light btn-sm">📋 Seguimiento de Oficios</a>
+                <a th:href="@{/dias-inhabiles}" class="btn btn-outline-light btn-sm">📅 Días Inhábiles</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes Flash de Éxito o Error -->
+    <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>✅ Éxito:</strong> <span th:text="${mensajeExito}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>❌ Error:</strong> <span th:text="${mensajeError}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Acciones -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a th:href="@{/auditoria/crear-prueba}" class="btn btn-primary btn-sm">
+            ➕ Crear Registro de Prueba
+        </a>
+        <span class="badge bg-secondary" th:text="${#lists.size(registros)} + ' eventos registrados'">0 eventos</span>
+    </div>
+
+    <!-- Listado de Auditoría -->
+    <div class="card">
+        <div class="card-header">
+            🔍 Eventos Registrados en la Bitácora
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-dark">
+                    <tr>
+                        <th style="width: 70px;">ID</th>
+                        <th>Usuario</th>
+                        <th>Módulo</th>
+                        <th>Acción</th>
+                        <th>Detalle</th>
+                        <th>IP Origen</th>
+                        <th>Fecha y Hora</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(registros)}">
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            No hay registros de auditoría en el sistema todavía. Puedes generar uno de prueba con el botón superior.
+                        </td>
+                    </tr>
+                    <tr th:each="reg : ${registros}">
+                        <td class="fw-bold" th:text="${reg.id}">1</td>
+                        <td>
+                            <span th:if="${reg.usuario != null}">
+                                <strong th:text="${reg.usuario.nombre}">Administrador</strong>
+                                <small class="text-muted d-block" th:text="'(' + ${reg.usuario.numeroEmpleado} + ')'">(EMP-001)</small>
+                            </span>
+                            <span th:if="${reg.usuario == null}" class="text-muted">Sistema</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-info text-dark" th:text="${reg.modulo}">SOLICITUDES</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary" th:text="${reg.accion}">CONFIRMAR_OCR</span>
+                        </td>
+                        <td th:text="${reg.detalle}">Detalle...</td>
+                        <td><code th:text="${reg.ipOrigen}">127.0.0.1</code></td>
+                        <td class="small" th:text="${#temporals.format(reg.fechaHora, 'dd/MM/yyyy HH:mm:ss')}">2026-11-10 12:00:00</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
