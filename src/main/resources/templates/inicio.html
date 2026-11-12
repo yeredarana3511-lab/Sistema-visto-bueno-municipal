@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Sistema de Visto Bueno Municipal</title>
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar-custom {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-bottom: 3px solid #2563eb;
+        }
+        .hero-banner {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
+        }
+        .card-module {
+            border: none;
+            border-radius: 0.85rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-module:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+        }
+        .card-module-header {
+            border-radius: 0.85rem 0.85rem 0 0;
+            padding: 1.25rem;
+            font-weight: 600;
+            color: white;
+        }
+        .card-module-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+        }
+        .footer {
+            margin-top: auto;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            padding: 1rem 0;
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Barra de Navegación Superior -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom py-2 shadow-sm">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" th:href="@{/inicio}">
+            <i class="bi bi-shield-check fs-3 text-primary me-2"></i>
+            <div>
+                <span class="fw-bold fs-5 d-block text-white lh-1">Visto Bueno Municipal</span>
+                <small class="text-white-50" style="font-size: 0.75rem;">H. Ayuntamiento</small>
+            </div>
+        </a>
+
+        <!-- Menú de Usuario y Cierre de Sesión -->
+        <div class="d-flex align-items-center ms-auto">
+            <div class="text-end me-3 text-white">
+                <div class="fw-semibold small" th:text="${usuarioActual != null ? usuarioActual.nombre + (usuarioActual.apellidos != null ? ' ' + usuarioActual.apellidos : '') : #authentication.name}">
+                    Usuario
+                </div>
+                <span class="badge bg-primary" th:text="${usuarioActual != null && usuarioActual.rol != null ? usuarioActual.rol.nombre : 'Usuario'}">
+                    Rol
+                </span>
+            </div>
+
+            <!-- Botón de Cerrar Sesión con CSRF -->
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="btn btn-outline-light btn-sm" title="Cerrar Sesión">
+                    <i class="bi bi-box-arrow-right me-1"></i> Salir
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- Contenido Principal -->
+<main class="container my-4">
+
+    <!-- Notificación si intentó entrar a una URL restringida -->
+    <div th:if="${param.denegado}" class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-shield-exclamation me-2 fs-5"></i>
+        <strong>Acceso Restringido:</strong> Tu rol actual no cuenta con privilegios para entrar al módulo solicitado.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Banner de Bienvenida y Perfil de Permisos -->
+    <div class="hero-banner mb-4">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h2 class="fw-bold mb-2">
+                    ¡Bienvenido, <span th:text="${usuarioActual != null ? usuarioActual.nombre : #authentication.name}">Usuario</span>!
+                </h2>
+                <p class="mb-2 text-white-50">
+                    Sistema integral de gestión de solicitudes de Visto Bueno Municipal para <strong>Ecología</strong>, <strong>Reglamentos</strong> y <strong>Protección Civil</strong>.
+                </p>
+                <!-- Resumen de rol según diagrama estricto -->
+                <div class="small">
+                    <span sec:authorize="hasAnyRole('ADMIN', 'SUPER_ADMIN')" class="badge bg-dark text-white border border-secondary">
+                        <i class="bi bi-tools me-1"></i> Perfil: Administrador (Mantenimiento Técnico y del Sistema)
+                    </span>
+                    <span sec:authorize="hasRole('SECRETARIA')" class="badge bg-info text-dark">
+                        <i class="bi bi-file-earmark-person me-1"></i> Perfil: Secretari@ (Captura, OCR, Corrección y Envío)
+                    </span>
+                    <span sec:authorize="hasRole('SUPERVISOR')" class="badge bg-success text-white">
+                        <i class="bi bi-patch-check-fill me-1"></i> Perfil: Supervisor (Acción Única: Aprobar o Rechazar Visto Bueno)
+                    </span>
+                </div>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <span class="badge bg-light text-dark py-2 px-3 fs-6 shadow-sm">
+                    <i class="bi bi-person-badge me-1"></i> No. Empleado: <strong th:text="${#authentication.name}">ADMIN01</strong>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold text-dark m-0">Módulos del Sistema</h4>
+        <small class="text-muted">Acciones autorizadas para tu perfil</small>
+    </div>
+
+    <!-- Cuadrícula de Módulos con Segregación Estricta de Funciones -->
+    <div class="row g-4">
+
+        <!-- 1. ADMINISTRADOR: Mantenimiento del Sistema, Usuarios y Roles -->
+        <div sec:authorize="hasAnyRole('ADMIN', 'SUPER_ADMIN')" class="col-md-6 col-lg-4">
+            <div class="card card-module border-dark">
+                <div class="card-module-header bg-dark d-flex align-items-center">
+                    <div class="icon-circle bg-primary text-white">
+                        <i class="bi bi-gear-wide-connected"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Mantenimiento del Sistema</h5>
+                        <small class="text-white-50">Exclusivo Administrador</small>
+                    </div>
+                </div>
+                <div class="card-module-body">
+                    <div>
+                        <span class="badge bg-primary mb-2"><i class="bi bi-tools me-1"></i> Soporte y Cuentas</span>
+                        <p class="text-secondary small mb-3">
+                            Dar mantenimiento a las computadoras y al sistema. Gestión de usuarios, roles, seguridad con BCrypt y auditoría técnica.
+                        </p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/usuarios}" class="btn btn-primary flex-grow-1">
+                            <i class="bi bi-people-fill me-1"></i> Usuarios
+                        </a>
+                        <a th:href="@{/roles}" class="btn btn-outline-secondary" title="Configurar Roles y Permisos">
+                            <i class="bi bi-shield-lock-fill me-1"></i> Roles
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. SECRETARIA / OCR: Ella hace todos los procesos (Captura, OCR, Corrección y Envío) -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card card-module border-primary">
+                <div class="card-module-header bg-primary d-flex align-items-center">
+                    <div class="icon-circle bg-white text-primary">
+                        <i class="bi bi-file-earmark-arrow-up-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Captura y OCR</h5>
+                        <small class="text-white-50">Exclusivo Secretari@</small>
+                    </div>
+                </div>
+                <div class="card-module-body">
+                    <div>
+                        <!-- Si es Secretari@: AUTORIZADO -->
+                        <span sec:authorize="hasRole('SECRETARIA')" class="badge bg-success mb-2">
+                            <i class="bi bi-check-circle me-1"></i> Módulo Autorizado (Secretari@)
+                        </span>
+                        <!-- Si es Administrador: NO PUEDE MODIFICAR OCR -->
+                        <span sec:authorize="hasAnyRole('ADMIN', 'SUPER_ADMIN')" class="badge bg-secondary mb-2">
+                            <i class="bi bi-slash-circle me-1"></i> Bloqueado para Administrador
+                        </span>
+                        <!-- Si es Supervisor: NO PUEDE CAPTURAR -->
+                        <span sec:authorize="hasRole('SUPERVISOR')" class="badge bg-secondary mb-2">
+                            <i class="bi bi-lock me-1"></i> Exclusivo Secretari@
+                        </span>
+                        <p class="text-secondary small mb-3">
+                            Subir solicitud, procesar con OCR, revisar datos auto-rellenados, corregir datos manualmente y enviar para generación de folio.
+                        </p>
+                    </div>
+                    <!-- Botón solo activo para Secretaria -->
+                    <button sec:authorize="hasRole('SECRETARIA')" class="btn btn-primary w-100">
+                        <i class="bi bi-cloud-arrow-up me-1"></i> Subir Solicitud y Procesar OCR
+                    </button>
+                    <!-- Bloqueado para Administrador y Supervisor -->
+                    <button sec:authorize="!hasRole('SECRETARIA')" class="btn btn-outline-secondary w-100" disabled>
+                        <i class="bi bi-slash-circle me-1"></i> Administrador/Supervisor sin acceso a OCR
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. SUPERVISOR: Reducido a una sola acción (Encargado de dar el visto bueno: Aprobar o Rechazar) -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card card-module border-success">
+                <div class="card-module-header bg-success d-flex align-items-center">
+                    <div class="icon-circle bg-white text-success">
+                        <i class="bi bi-clipboard2-check-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Dictamen de Visto Bueno</h5>
+                        <small class="text-white-50">Exclusivo Supervisor</small>
+                    </div>
+                </div>
+                <div class="card-module-body">
+                    <div>
+                        <!-- Si es Supervisor: AUTORIZADO -->
+                        <span sec:authorize="hasRole('SUPERVISOR')" class="badge bg-success mb-2">
+                            <i class="bi bi-check-circle me-1"></i> Módulo Autorizado (Supervisor)
+                        </span>
+                        <!-- Si es Administrador: NO PUEDE EVALUAR SOLICITUDES -->
+                        <span sec:authorize="hasAnyRole('ADMIN', 'SUPER_ADMIN')" class="badge bg-secondary mb-2">
+                            <i class="bi bi-slash-circle me-1"></i> Bloqueado para Administrador
+                        </span>
+                        <!-- Si es Secretari@: NO PUEDE DICTAMINAR -->
+                        <span sec:authorize="hasRole('SECRETARIA')" class="badge bg-secondary mb-2">
+                            <i class="bi bi-hourglass-split me-1"></i> Exclusivo Supervisor
+                        </span>
+                        <p class="text-secondary small mb-3">
+                            Acción única de supervisión: Recibir la solicitud con folio y emitir el Visto Bueno municipal (<strong>Aprobar o Rechazar</strong>) para actualizar el estado en BD.
+                        </p>
+                    </div>
+                    <!-- Botón solo activo para Supervisor -->
+                    <button sec:authorize="hasRole('SUPERVISOR')" class="btn btn-success w-100">
+                        <i class="bi bi-check2-circle me-1"></i> Evaluar Solicitudes (Aprobar/Rechazar)
+                    </button>
+                    <!-- Bloqueado para Administrador y Secretaria -->
+                    <button sec:authorize="!hasRole('SUPERVISOR')" class="btn btn-outline-secondary w-100" disabled>
+                        <i class="bi bi-slash-circle me-1"></i> Administrador sin acceso a evaluación
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. BANDEJA DE SEGUIMIENTO Y SEMÁFORO (Auditoría y Plazos de 3 Dependencias) -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card card-module border-warning">
+                <div class="card-module-header bg-warning text-dark d-flex align-items-center">
+                    <div class="icon-circle bg-dark text-warning">
+                        <i class="bi bi-stoplights-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0 text-dark">Bandeja de Seguimiento</h5>
+                        <small class="text-dark-50">Semáforo de Días Hábiles</small>
+                    </div>
+                </div>
+                <div class="card-module-body">
+                    <div>
+                        <p class="text-secondary small mb-2">
+                            Trazabilidad de oficios en Ecología, Reglamentos y Protección Civil según días hábiles:
+                        </p>
+                        <div class="d-flex justify-content-between mb-3 small text-center">
+                            <span class="badge bg-success" title="Días 1 a 20">Verde (1-20d)</span>
+                            <span class="badge bg-warning text-dark" title="Días 21 a 29">Amarillo (21-29d)</span>
+                            <span class="badge bg-danger" title="Días 30 a 37">Rojo (30-37d)</span>
+                            <span class="badge" style="background-color: #6b21a8; color: white;" title="Día 38 en adelante">Morado (38+d)</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-dark w-100">
+                        <i class="bi bi-clock-history me-1"></i> Consultar Bandeja
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<!-- Pie de Página -->
+<footer class="footer text-center">
+    <div class="container">
+        <span>Sistema de Generación y Seguimiento de Solicitudes de Visto Bueno Municipal &copy; 2026</span>
+    </div>
+</footer>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
