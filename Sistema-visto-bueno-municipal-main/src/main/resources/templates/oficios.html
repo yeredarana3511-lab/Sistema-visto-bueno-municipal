@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Seguimiento de Oficios - Visto Bueno Municipal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .header-banner {
+            background: linear-gradient(135deg, #1b3a57 0%, #0d6efd 100%);
+            color: white;
+            padding: 2rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 2rem;
+        }
+        .card-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #edf2f7;
+            font-weight: 600;
+        }
+        .semaforo-morado {
+            background-color: #6f42c1 !important;
+        }
+        .badge-semaforo {
+            font-size: 0.85rem;
+            padding: 0.4em 0.75em;
+            font-weight: 600;
+            border-radius: 20px;
+        }
+        .legend-badge {
+            display: inline-block;
+            padding: 0.35rem 0.65rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container py-4">
+
+    <!-- Encabezado Principal -->
+    <div class="header-banner">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h1 class="h3 mb-1">🏛️ Sistema de Seguimiento de Oficios de Visto Bueno</h1>
+                <p class="mb-0 text-white-50">Control de tiempos de respuesta por dependencias municipales</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a th:href="@{/dias-inhabiles}" class="btn btn-outline-light btn-sm">
+                    📅 Días Inhábiles
+                </a>
+                <a th:href="@{/auditoria}" class="btn btn-outline-light btn-sm">
+                    📜 Auditoría
+                </a>
+                <a th:href="@{/inicializar-dependencias}" class="btn btn-outline-light btn-sm">
+                    🔄 Inicializar Dependencias
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reglas del Semáforo -->
+    <div class="card mb-4">
+        <div class="card-body py-2">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <span class="fw-bold text-secondary">🚦 Regla de Semáforos (Días Hábiles):</span>
+                <span class="legend-badge bg-success text-white">🟢 Verde (1-20 días)</span>
+                <span class="legend-badge bg-warning text-dark">🟡 Amarillo (21-29 días)</span>
+                <span class="legend-badge bg-danger text-white">🔴 Rojo (30-37 días)</span>
+                <span class="legend-badge semaforo-morado text-white">🟣 Morado (38+ días)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes Flash de Éxito o Error -->
+    <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>✅ Éxito:</strong> <span th:text="${mensajeExito}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>❌ Error:</strong> <span th:text="${mensajeError}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="row">
+        <!-- Formulario para Generar Nuevo Oficio -->
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-header">
+                    📝 Generar Nuevo Oficio
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/oficios/guardar}" method="post">
+                        <!-- Folio de Solicitud -->
+                        <div class="mb-3">
+                            <label for="folioSolicitud" class="form-label fw-semibold">Folio de la Solicitud *</label>
+                            <input type="text" class="form-control" id="folioSolicitud" name="folioSolicitud"
+                                   placeholder="Ej: SOL-2024-001" required>
+                            <div class="form-text">Folio de la solicitud ciudadana a vincular.</div>
+                        </div>
+
+                        <!-- Dependencia Destino -->
+                        <div class="mb-3">
+                            <label for="dependenciaId" class="form-label fw-semibold">Dependencia Destino *</label>
+                            <select class="form-select" id="dependenciaId" name="dependenciaId" required>
+                                <option value="" disabled selected>-- Seleccione una dependencia --</option>
+                                <option th:each="dep : ${dependencias}"
+                                        th:value="${dep.id}"
+                                        th:text="${dep.nombre + ' (' + (dep.prefijoFolio != null ? dep.prefijoFolio : 'S/P') + ')'}">
+                                </option>
+                            </select>
+                            <div th:if="${#lists.isEmpty(dependencias)}" class="text-danger small mt-1">
+                                No hay dependencias cargadas. Haz clic en "Inicializar Dependencias".
+                            </div>
+                        </div>
+
+                        <!-- Fecha de Inicio del Conteo -->
+                        <div class="mb-3">
+                            <label for="fechaInicioConteo" class="form-label fw-semibold">Fecha Inicio Conteo *</label>
+                            <input type="date" class="form-control" id="fechaInicioConteo" name="fechaInicioConteo"
+                                   th:value="${fechaHoy}" required>
+                            <div class="form-text">Fecha a partir de la cual se cuentan los días hábiles.</div>
+                        </div>
+
+                        <!-- Correo Electrónico para Notificación -->
+                        <div class="mb-3">
+                            <label for="emailDestino" class="form-label fw-semibold">Correo de Notificación (Opcional)</label>
+                            <input type="email" class="form-control" id="emailDestino" name="emailDestino"
+                                   placeholder="correo@ejemplo.com">
+                            <div class="form-text">Se enviará correo automático si se ingresa.</div>
+                        </div>
+
+                        <!-- Contenido del Oficio -->
+                        <div class="mb-3">
+                            <label for="contenidoDoc" class="form-label fw-semibold">Contenido del Oficio *</label>
+                            <textarea class="form-control" id="contenidoDoc" name="contenidoDoc" rows="3"
+                                      placeholder="Describa el asunto o motivo del visto bueno solicitado..." required></textarea>
+                        </div>
+
+                        <!-- Botón Guardar -->
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                            💾 Guardar y Generar Oficio
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Probador Rápido de Semáforo (Cálculo directo) -->
+            <div class="card">
+                <div class="card-header">
+                    🧪 Simulador de Semáforo
+                </div>
+                <div class="card-body">
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <label class="form-label small">Fecha Inicio:</label>
+                            <input type="date" id="simInicio" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small">Fecha Fin:</label>
+                            <input type="date" id="simFin" class="form-control form-control-sm">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-secondary btn-sm w-100" onclick="simularSemaforo()">
+                        Calcular Días Hábiles
+                    </button>
+                    <div id="simResultado" class="mt-2 text-center" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Listado de Oficios Registrados -->
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>📋 Oficios Registrados</span>
+                    <span class="badge bg-secondary" th:text="${#lists.size(oficios)} + ' oficios'">0</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Folio Oficio</th>
+                                <th>Solicitud</th>
+                                <th>Dependencia</th>
+                                <th>Inicio</th>
+                                <th class="text-center">Días Hábiles</th>
+                                <th class="text-center">Semáforo</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${#lists.isEmpty(oficios)}">
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    No hay oficios registrados todavía. Utiliza el formulario de la izquierda para registrar uno.
+                                </td>
+                            </tr>
+                            <tr th:each="item : ${oficios}">
+                                <td>
+                                    <strong th:text="${item.oficio.folioOficio}">OF-001</strong>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border" th:text="${item.folioSolicitud}">SOL-001</span>
+                                </td>
+                                <td th:text="${item.oficio.dependencia != null ? item.oficio.dependencia.nombre : 'Sin asignar'}">Ecología</td>
+                                <td class="small" th:text="${item.oficio.fechaInicioConteo}">2024-01-01</td>
+                                <td class="text-center fw-bold" th:text="${item.diasHabiles}">0</td>
+                                <td class="text-center">
+                                    <span th:class="'badge badge-semaforo ' + ${item.badgeClass}"
+                                          th:text="${item.colorSemaforo}">
+                                        VERDE
+                                    </span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function simularSemaforo() {
+        const inicio = document.getElementById('simInicio').value;
+        const fin = document.getElementById('simFin').value;
+        const out = document.getElementById('simResultado');
+
+        if (!inicio || !fin) {
+            alert('Por favor selecciona ambas fechas');
+            return;
+        }
+
+        fetch(`/api/oficios/prueba-semaforo?fechaInicio=${inicio}&fechaFin=${fin}`)
+            .then(res => res.json())
+            .then(data => {
+                out.style.display = 'block';
+                let colorClass = 'bg-secondary';
+                if (data.color_del_semaforo === 'VERDE') colorClass = 'bg-success';
+                else if (data.color_del_semaforo === 'AMARILLO') colorClass = 'bg-warning text-dark';
+                else if (data.color_del_semaforo === 'ROJO') colorClass = 'bg-danger';
+                else if (data.color_del_semaforo === 'MORADO') colorClass = 'semaforo-morado text-white';
+
+                out.innerHTML = `
+                    <div class="alert alert-light border mt-2 py-2 mb-0">
+                        <strong>Días Hábiles:</strong> ${data.dias_habiles_calculados} <br>
+                        <strong>Semáforo:</strong>
+                        <span class="badge ${colorClass} px-3 py-1 mt-1">${data.color_del_semaforo}</span>
+                    </div>
+                `;
+            })
+            .catch(err => {
+                out.style.display = 'block';
+                out.innerHTML = `<span class="text-danger small">Error al consultar el cálculo</span>`;
+            });
+    }
+</script>
+</body>
+</html>
