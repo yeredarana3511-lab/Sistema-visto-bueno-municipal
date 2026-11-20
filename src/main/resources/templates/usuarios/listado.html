@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios - Gobierno de Tonalá</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/tonala-theme.css}">
+</head>
+<body class="bg-light">
+
+<!-- Barra de Navegación Oficial -->
+<div th:replace="~{fragments/navbar :: navbar('usuarios')}"></div>
+
+<main class="container my-4">
+
+    <!-- Encabezado Institucional -->
+    <div class="header-banner-tonala mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <span class="badge mb-2" style="background-color: #c59b27; color: #212529; font-weight: 700;">
+                    <i class="bi bi-shield-lock-fill me-1"></i> CONTROL DE ACCESOS
+                </span>
+                <h2 class="h3 fw-bold mb-1 text-white">
+                    <i class="bi bi-people-fill me-2"></i>Catálogo de Usuarios del Sistema
+                </h2>
+                <p class="mb-0 text-white-50">Administración de cuentas de servidores públicos, números de empleado y roles asignados</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a th:href="@{/inicio}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-house-door me-1"></i> Inicio
+                </a>
+                <a th:href="@{/roles/nuevo}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-shield-plus me-1"></i> + Nuevo Perfil
+                </a>
+                <a th:href="@{/usuarios/nuevo}" class="btn btn-tonala-gold btn-sm">
+                    <i class="bi bi-person-plus-fill me-1"></i> + Nuevo Usuario
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes Flash de Éxito o Error -->
+    <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show shadow-sm border-start border-4 border-success" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${mensajeExito}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show shadow-sm border-start border-4 border-danger" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${mensajeError}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Filtros de búsqueda -->
+    <div class="card card-tonala shadow-sm mb-4">
+        <div class="card-body">
+            <form th:action="@{/usuarios}" method="get" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label small fw-bold text-dark">Buscar por No. Empleado o Nombre:</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                        <input type="text" name="filtro" class="form-control" placeholder="Ej. ADMIN01, Carlos..." th:value="${filtro}">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-dark">Estado de la cuenta:</label>
+                    <select name="activo" class="form-select">
+                        <option value="">-- Todos los estados --</option>
+                        <option value="true" th:selected="${activo == true}">Activos</option>
+                        <option value="false" th:selected="${activo == false}">Inactivos</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-tonala-primary flex-grow-1">
+                        <i class="bi bi-filter me-1"></i> Filtrar
+                    </button>
+                    <a th:href="@{/usuarios}" class="btn btn-outline-secondary" title="Limpiar Filtro">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de resultados -->
+    <div class="card card-tonala shadow-sm">
+        <div class="card-header-tonala d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-person-lines-fill me-2"></i>Personal Registrado</span>
+            <span class="badge" style="background-color: #c59b27; color: #212529;" th:text="${#lists.size(usuarios)} + ' usuarios'">0 usuarios</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead style="background-color: #212529; color: white;">
+                    <tr>
+                        <th>No. Empleado</th>
+                        <th>Nombre Completo</th>
+                        <th>Correo Institucional</th>
+                        <th>Rol Asignado</th>
+                        <th>Estado</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Si no hay usuarios -->
+                    <tr th:if="${#lists.isEmpty(usuarios)}">
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            <i class="bi bi-people fs-3 d-block mb-2 text-muted"></i>
+                            No se encontraron usuarios registrados con el criterio especificado.
+                        </td>
+                    </tr>
+
+                    <!-- Iteración de usuarios -->
+                    <tr th:each="u : ${usuarios}">
+                        <td>
+                            <strong class="text-dark" th:text="${u.numeroEmpleado}">ADMIN01</strong>
+                        </td>
+                        <td th:text="${u.nombre + (u.apellidos != null ? ' ' + u.apellidos : '')}">Nombre</td>
+                        <td class="text-muted small" th:text="${u.correo}">correo@tonala.gob.mx</td>
+                        <td>
+                            <span class="badge" style="background-color: #822828; color: white;"
+                                  th:text="${u.rol != null ? u.rol.nombre : 'Sin Rol'}">
+                            </span>
+                        </td>
+                        <td>
+                            <span th:class="${u.activo ? 'badge bg-success' : 'badge bg-danger'}"
+                                  th:text="${u.activo ? 'Activo' : 'Inactivo'}">
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a th:href="@{/usuarios/editar/{id}(id=${u.id})}" class="btn btn-sm btn-outline-dark">
+                                <i class="bi bi-pencil-square me-1"></i> Editar
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- Pie de Página Oficial -->
+<div th:replace="~{fragments/navbar :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

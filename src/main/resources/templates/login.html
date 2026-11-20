@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Gobierno de Tonalá</title>
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Tonalá Theme CSS -->
+    <link rel="stylesheet" th:href="@{/css/tonala-theme.css}">
+    <style>
+        body {
+            background-color: #212529;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 1.5rem;
+        }
+        .card-login {
+            border: 1px solid #c59b27;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            background-color: #ffffff;
+            overflow: hidden;
+            width: 100%;
+            max-width: 420px;
+        }
+        .login-header {
+            background-color: #822828;
+            border-bottom: 3px solid #c59b27;
+            color: white;
+            padding: 2rem 2rem 1.5rem;
+            text-align: center;
+        }
+        .login-logo-container {
+            background: #ffffff;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #c59b27;
+            margin-bottom: 1rem;
+            padding: 8px 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .login-body {
+            padding: 2rem;
+        }
+        .form-control:focus {
+            border-color: #822828;
+            box-shadow: 0 0 0 0.25rem rgba(130, 40, 40, 0.25);
+        }
+        .btn-tonala-login {
+            background-color: #822828;
+            border: 1px solid #822828;
+            color: #ffffff;
+            padding: 0.75rem;
+            font-weight: 700;
+            border-radius: 0.4rem;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+        .btn-tonala-login:hover {
+            background-color: #993131;
+            border-color: #993131;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card-login">
+    <!-- Encabezado Institucional -->
+    <div class="login-header">
+        <div class="login-logo-container">
+            <!-- Logotipo Oficial Gobierno de Tonalá -->
+            <img th:src="@{/images/logo-tonala.png}" alt="Gobierno de Tonalá - Ciudad de la Transformación" style="height: 70px; width: auto; object-fit: contain;">
+        </div>
+        <h4 class="fw-bold m-0 text-white" style="letter-spacing: 0.5px;">GOBIERNO DE TONALÁ</h4>
+        <div class="badge mt-2" style="background-color: #c59b27; color: #212529; font-weight: 700; font-size: 0.75rem;">
+            VISTO BUENO MUNICIPAL
+        </div>
+    </div>
+
+    <!-- Cuerpo del formulario -->
+    <div class="login-body">
+        <!-- Alertas de estado -->
+        <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show text-center py-2 mb-3 border-start border-4 border-danger" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> Número de empleado o contraseña incorrectos.
+        </div>
+        <div th:if="${param.logout}" class="alert alert-info alert-dismissible fade show text-center py-2 mb-3 border-start border-4 border-info" role="alert">
+            <i class="bi bi-info-circle-fill me-1"></i> Sesión cerrada correctamente.
+        </div>
+
+        <form th:action="@{/login}" method="post">
+            <!-- Campo Usuario / Número de Empleado -->
+            <div class="mb-3">
+                <label for="username" class="form-label text-dark fw-semibold small">
+                    <i class="bi bi-person-badge me-1" style="color: #822828;"></i>Número de Empleado
+                </label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light text-secondary"><i class="bi bi-person-fill"></i></span>
+                    <input type="text" id="username" name="username" class="form-control" placeholder="Ej. ADMIN01" required autofocus>
+                </div>
+            </div>
+
+            <!-- Campo Contraseña -->
+            <div class="mb-4">
+                <label for="password" class="form-label text-dark fw-semibold small">
+                    <i class="bi bi-key-fill me-1" style="color: #822828;"></i>Contraseña
+                </label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light text-secondary"><i class="bi bi-lock-fill"></i></span>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <!-- Botón de Ingreso -->
+            <div class="d-grid">
+                <button type="submit" class="btn btn-tonala-login">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>INICIAR SESIÓN
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

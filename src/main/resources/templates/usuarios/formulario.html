@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Usuario - Gobierno de Tonalá</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/tonala-theme.css}">
+</head>
+<body class="bg-light">
+
+<!-- Barra de Navegación Oficial -->
+<div th:replace="~{fragments/navbar :: navbar('usuarios')}"></div>
+
+<main class="container my-4">
+
+    <!-- Encabezado Institucional -->
+    <div class="header-banner-tonala mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <span class="badge mb-2" style="background-color: #c59b27; color: #212529; font-weight: 700;">
+                    <i class="bi bi-person-fill-gear me-1"></i> ADMINISTRACIÓN DE CUENTAS
+                </span>
+                <h2 class="h3 fw-bold mb-1 text-white" th:text="${usuario.id == null ? '➕ Alta de Nuevo Servidor Público' : '✏️ Edición de Datos de Servidor Público'}">
+                    Usuario
+                </h2>
+                <p class="mb-0 text-white-50">Configuración de credenciales de acceso seguro cifradas con algoritmo BCrypt</p>
+            </div>
+            <div>
+                <a th:href="@{/usuarios}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Volver al Listado
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-tonala shadow-sm">
+                <div class="card-header-tonala">
+                    <i class="bi bi-person-vcard me-2"></i>Datos del Empleado y Credenciales
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/usuarios/guardar}" th:object="${usuario}" method="post">
+                        <input type="hidden" th:field="*{id}"/>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-dark">
+                                    <i class="bi bi-upc-scan me-1" style="color: #822828;"></i>No. Empleado *
+                                </label>
+                                <input type="text" class="form-control" th:field="*{numeroEmpleado}" placeholder="Ej: EMP1024 o ADMIN02" required/>
+                                <div class="form-text small">Identificador único institucional para iniciar sesión.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-dark">
+                                    <i class="bi bi-envelope-at me-1" style="color: #822828;"></i>Correo Institucional *
+                                </label>
+                                <input type="email" class="form-control" th:field="*{correo}" placeholder="ejemplo@tonala.gob.mx" required/>
+                                <div class="form-text small">Dirección para notificaciones del sistema.</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-dark">
+                                    <i class="bi bi-person me-1" style="color: #822828;"></i>Nombre(s) *
+                                </label>
+                                <input type="text" class="form-control" th:field="*{nombre}" placeholder="Nombre de pila" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-dark">
+                                    <i class="bi bi-person me-1" style="color: #822828;"></i>Apellidos:
+                                </label>
+                                <input type="text" class="form-control" th:field="*{apellidos}" placeholder="Apellidos completos"/>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label fw-semibold text-dark mb-0">
+                                        <i class="bi bi-shield-check me-1" style="color: #822828;"></i>Rol en el Sistema *
+                                    </label>
+                                    <a th:href="@{/roles/nuevo}" class="btn btn-outline-dark btn-sm py-0 px-2" style="font-size: 0.75rem;" title="Crear nuevo perfil de permisos">
+                                        <i class="bi bi-shield-plus me-1"></i>+ Nuevo Perfil
+                                    </a>
+                                </div>
+                                <select class="form-select" th:field="*{rol.id}" required>
+                                    <option value="">-- Seleccionar Rol --</option>
+                                    <option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.nombre} + ' (' + ${r.clave} + ')'"></option>
+                                </select>
+                                <div class="form-text small">Determina los módulos y acciones permitidas en el sistema.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-dark">
+                                    <i class="bi bi-key me-1" style="color: #822828;"></i>Contraseña:
+                                </label>
+                                <input type="password" name="password" class="form-control" th:required="${usuario.id == null}" placeholder="Mínimo 8 caracteres"/>
+                                <div class="form-text small" th:text="${usuario.id == null ? 'Clave inicial alfanumérica de 8 caracteres.' : 'Dejar en blanco para conservar la contraseña actual.'}">
+                                    Mínimo 8 caracteres alfanuméricos.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check form-switch mt-4 p-3 bg-light rounded border">
+                            <input class="form-check-input ms-0 me-2" type="checkbox" th:field="*{activo}" id="activo">
+                            <label class="form-check-label fw-semibold text-dark" for="activo">
+                                Cuenta de Servidor Público Activa
+                            </label>
+                            <div class="small text-muted">Las cuentas inactivas tienen revocado el acceso de inicio de sesión.</div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                            <a th:href="@{/usuarios}" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-tonala-primary px-4">
+                                <i class="bi bi-check2-circle me-1"></i> Guardar Servidor Público
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- Pie de Página Oficial -->
+<div th:replace="~{fragments/navbar :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

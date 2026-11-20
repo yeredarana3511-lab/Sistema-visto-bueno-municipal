@@ -1,0 +1,209 @@
+:root {
+    --tonala-primary: #822828;
+    --tonala-primary-hover: #6a1f1f;
+    --tonala-primary-light: #fbeeed;
+    --tonala-secondary: #212529;
+    --tonala-secondary-hover: #15181b;
+    --tonala-gold: #c59b27;
+    --tonala-gold-light: #fef9e7;
+    --tonala-bg: #f8fafc;
+    --tonala-card-border: #dee2e6;
+}
+
+body {
+    background-color: var(--tonala-bg);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #2b2f33;
+}
+
+/* Barra de Navegación Oficial: Color Secundario Sólido #212529 */
+.navbar-tonala {
+    background-color: #212529;
+    border-bottom: 3px solid #822828;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-tonala .nav-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-weight: 500;
+    font-size: 0.92rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+}
+
+.navbar-tonala .nav-link:hover, .navbar-tonala .nav-link.active {
+    color: #ffffff !important;
+    background-color: #822828;
+}
+
+/* Banner de Encabezado Principal: Color Primario Sólido #822828 */
+.header-banner-tonala {
+    background-color: #822828;
+    color: white;
+    padding: 1.5rem 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-left: 6px solid #c59b27;
+    box-shadow: 0 4px 12px rgba(130, 40, 40, 0.15);
+}
+
+/* Botones de Estilo Tonalá */
+.btn-tonala-primary {
+    background-color: #822828;
+    border-color: #822828;
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 0.35rem;
+    transition: all 0.15s ease;
+}
+
+.btn-tonala-primary:hover, .btn-tonala-primary:focus {
+    background-color: #6a1f1f;
+    border-color: #6a1f1f;
+    color: #ffffff;
+}
+
+.btn-tonala-secondary {
+    background-color: #212529;
+    border-color: #212529;
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 0.35rem;
+}
+
+.btn-tonala-secondary:hover {
+    background-color: #343a40;
+    border-color: #343a40;
+    color: #ffffff;
+}
+
+.btn-tonala-dark {
+    background-color: #212529;
+    border-color: #212529;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.btn-tonala-dark:hover {
+    background-color: #343a40;
+    border-color: #343a40;
+    color: #ffffff;
+}
+
+.btn-tonala-gold {
+    background-color: #c59b27;
+    border-color: #c59b27;
+    color: #212529;
+    font-weight: 700;
+}
+
+.btn-tonala-gold:hover {
+    background-color: #b08920;
+    border-color: #b08920;
+    color: #212529;
+}
+
+.btn-tonala-outline {
+    border: 1px solid #822828;
+    color: #822828;
+    background-color: transparent;
+    font-weight: 600;
+}
+
+.btn-tonala-outline:hover {
+    background-color: #822828;
+    color: #ffffff;
+}
+
+.btn-outline-tonala {
+    border-color: #822828;
+    color: #822828;
+    font-weight: 600;
+}
+
+.btn-outline-tonala:hover {
+    background-color: #822828;
+    color: #ffffff;
+}
+
+/* Tarjetas y Módulos */
+.card-tonala {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.card-header-tonala {
+    background-color: #822828;
+    color: white;
+    font-weight: 600;
+    border-radius: 0.5rem 0.5rem 0 0 !important;
+    padding: 0.85rem 1.25rem;
+}
+
+.card-header-dark {
+    background-color: #212529;
+    color: white;
+    font-weight: 600;
+    border-radius: 0.5rem 0.5rem 0 0 !important;
+    padding: 0.85rem 1.25rem;
+}
+
+/* Insignias y Semáforos */
+.badge-tonala {
+    background-color: #822828;
+    color: #ffffff;
+}
+
+.badge-gold {
+    background-color: #c59b27;
+    color: #212529;
+    font-weight: 700;
+}
+
+.semaforo-morado {
+    background-color: #6f42c1 !important;
+    color: white;
+}
+
+.legend-badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+/* Pie de Página */
+.footer-tonala {
+    margin-top: auto;
+    background-color: #212529;
+    border-top: 3px solid #822828;
+    padding: 1.2rem 0;
+    color: #adb5bd;
+    font-size: 0.875rem;
+}
+
+.footer-tonala strong {
+    color: #ffffff;
+}
+
+/* Círculos de ícono */
+.icon-circle-tonala {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    background-color: #822828;
+    color: #ffffff;
+    border: 2px solid #c59b27;
+    margin-right: 0.75rem;
+}

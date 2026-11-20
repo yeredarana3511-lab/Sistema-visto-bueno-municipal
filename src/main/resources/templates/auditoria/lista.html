@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitácora de Auditoría - Gobierno de Tonalá</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/tonala-theme.css}">
+</head>
+<body class="bg-light">
+
+<!-- Barra de Navegación Oficial -->
+<div th:replace="~{fragments/navbar :: navbar('auditoria')}"></div>
+
+<main class="container my-4">
+
+    <!-- Encabezado Institucional -->
+    <div class="header-banner-tonala mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <span class="badge mb-2" style="background-color: #c59b27; color: #212529; font-weight: 700;">
+                    <i class="bi bi-shield-lock-fill me-1"></i> SEGURIDAD Y TRAZABILIDAD
+                </span>
+                <h2 class="h3 fw-bold mb-1 text-white">
+                    <i class="bi bi-journal-check me-2"></i>Bitácora de Auditoría del Sistema
+                </h2>
+                <p class="mb-0 text-white-50">Registro inmutable de transacciones, inicios de sesión, cambios de estados y permisos</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a th:href="@{/inicio}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-house-door me-1"></i> Inicio
+                </a>
+                <a th:href="@{/auditoria/crear-prueba}" class="btn btn-tonala-gold btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Evento de Prueba
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes Flash de Éxito o Error -->
+    <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show shadow-sm border-start border-4 border-success" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${mensajeExito}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show shadow-sm border-start border-4 border-danger" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${mensajeError}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Barra de Estado -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="text-muted small">
+            <i class="bi bi-info-circle me-1" style="color: #822828;"></i>Todos los accesos y modificaciones quedan resguardados bajo la norma de auditoría.
+        </div>
+        <span class="badge" style="background-color: #212529; color: white;" th:text="${#lists.size(registros)} + ' eventos registrados'">0 eventos</span>
+    </div>
+
+    <!-- Tabla de Registros -->
+    <div class="card card-tonala shadow-sm">
+        <div class="card-header-tonala d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-list-columns me-2"></i>Eventos Registrados en la Bitácora</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead style="background-color: #212529; color: white;">
+                    <tr>
+                        <th style="width: 70px;">ID</th>
+                        <th>Usuario</th>
+                        <th>Módulo</th>
+                        <th>Acción</th>
+                        <th>Detalle</th>
+                        <th>Fecha y Hora</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(registros)}">
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            <i class="bi bi-inbox fs-3 d-block mb-2 text-muted"></i>
+                            No hay registros de auditoría en el sistema todavía.
+                        </td>
+                    </tr>
+                    <tr th:each="reg : ${registros}">
+                        <td class="fw-bold" th:text="${reg.id}">1</td>
+                        <td>
+                            <span th:if="${reg.usuario != null}">
+                                <strong th:text="${reg.usuario.nombre != null ? reg.usuario.nombre : 'Usuario #' + reg.usuario.id}">Administrador</strong>
+                                <small class="text-muted d-block" th:if="${reg.usuario.numeroEmpleado != null}" th:text="'(' + ${reg.usuario.numeroEmpleado} + ')'">(EMP-001)</small>
+                            </span>
+                            <span th:if="${reg.usuario == null}" class="badge bg-secondary">Sistema</span>
+                        </td>
+                        <td>
+                            <span class="badge" style="background-color: #822828; color: white;" th:text="${reg.modulo}">SOLICITUDES</span>
+                        </td>
+                        <td>
+                            <span class="badge" style="background-color: #212529; color: white;" th:text="${reg.accion}">CONFIRMAR_OCR</span>
+                        </td>
+                        <td class="small" th:text="${reg.detalle}">Detalle...</td>
+                        <td class="small text-muted" th:text="${#temporals.format(reg.fechaHora, 'dd/MM/yyyy HH:mm:ss')}">2026-11-10 12:00:00</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- Pie de Página Oficial -->
+<div th:replace="~{fragments/navbar :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

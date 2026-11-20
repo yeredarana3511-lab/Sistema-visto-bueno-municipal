@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plantillas de Oficios - Gobierno de Tonalá</title>
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Tonalá Theme CSS -->
+    <link rel="stylesheet" th:href="@{/css/tonala-theme.css}">
+</head>
+<body>
+
+<!-- Barra de Navegación Unificada -->
+<div th:replace="~{fragments/navbar :: navbar('plantillas')}"></div>
+
+<main class="container my-4">
+
+    <!-- Encabezado Institucional -->
+    <div class="header-banner-tonala">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h2 class="h3 fw-bold mb-1">
+                    <i class="bi bi-file-earmark-code-fill me-2"></i>Plantillas Editables de Oficios
+                </h2>
+                <p class="mb-0 text-white-50">
+                    Personalización y formato oficial de oficios dirigidos a las dependencias municipales de Tonalá
+                </p>
+            </div>
+            <div>
+                <a th:href="@{/inicio}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Volver a Inicio
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes Flash de Notificación -->
+    <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i><strong>Éxito:</strong> <span th:text="${mensajeExito}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i><strong>Atención:</strong> <span th:text="${mensajeError}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="card card-tonala shadow-sm">
+        <div class="card-header card-header-tonala d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-buildings-fill me-2"></i>Dependencias Oficiales con Plantilla Configurable</span>
+            <span class="badge" style="background-color: #c59b27; color: white;">3 Dependencias</span>
+        </div>
+        <div class="card-body p-0 table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-secondary small">
+                    <tr>
+                        <th class="ps-3">ID</th>
+                        <th>Dependencia Municipal</th>
+                        <th>Prefijo de Folio</th>
+                        <th>Correo Institucional</th>
+                        <th>Secuencia Actual</th>
+                        <th>Estado de Plantilla</th>
+                        <th class="text-end pe-3">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="dep : ${dependencias}">
+                        <td class="ps-3 fw-bold" th:text="${dep.id}">1</td>
+                        <td>
+                            <strong th:text="${dep.nombre}">Ecología</strong>
+                        </td>
+                        <td>
+                            <span class="badge" style="background-color: #822828; color: white;" th:text="${dep.prefijoFolio}">ECO</span>
+                        </td>
+                        <td class="small" th:text="${dep.correoContacto != null ? dep.correoContacto : 'Sin correo configurado'}">
+                            contacto@municipio.gob.mx
+                        </td>
+                        <td th:text="${dep.secuenciaActual}">0</td>
+                        <td>
+                            <span th:if="${dep.plantillaHtml != null and !#strings.isEmpty(dep.plantillaHtml)}" class="badge bg-success">
+                                <i class="bi bi-check-circle me-1"></i> Personalizada
+                            </span>
+                            <span th:if="${dep.plantillaHtml == null or #strings.isEmpty(dep.plantillaHtml)}" class="badge bg-secondary">
+                                Predeterminada
+                            </span>
+                        </td>
+                        <td class="text-end pe-3">
+                            <a th:href="@{'/plantillas/editar/' + ${dep.id}}" class="btn btn-tonala-primary btn-sm">
+                                <i class="bi bi-pencil-square me-1"></i> Editar Plantilla HTML
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+
+<!-- Pie de Página Unificado -->
+<div th:replace="~{fragments/navbar :: footer}"></div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

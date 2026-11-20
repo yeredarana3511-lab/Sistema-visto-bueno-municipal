@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Sistema de Visto Bueno Municipal de Tonalá</title>
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Tonalá Theme CSS -->
+    <link rel="stylesheet" th:href="@{/css/tonala-theme.css}">
+    <style>
+        .card-module {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+        }
+        .card-module:hover {
+            box-shadow: 0 6px 18px rgba(130, 40, 40, 0.12);
+            border-color: #822828;
+        }
+        .card-module-header {
+            border-radius: 0.5rem 0.5rem 0 0;
+            padding: 1.1rem;
+            font-weight: 600;
+            color: white;
+            background-color: #822828;
+        }
+        .card-module-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<!-- Barra de Navegación Oficial Tonalá -->
+<div th:replace="~{fragments/navbar :: navbar('inicio')}"></div>
+
+<!-- Contenido Principal -->
+<main class="container my-4">
+
+    <!-- Notificación si intentó entrar a una URL restringida -->
+    <div th:if="${param.denegado}" class="alert alert-warning alert-dismissible fade show shadow-sm border-start border-4 border-warning" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-shield-exclamation me-2 fs-4 text-warning"></i>
+            <div>
+                <strong>Acceso Restringido:</strong> Tu rol actual no cuenta con privilegios para entrar al módulo solicitado.
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Banner Institucional de Bienvenida Gobierno de Tonalá -->
+    <div class="header-banner-tonala mb-4">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="badge me-2" style="background-color: #c59b27; color: #212529; font-weight: 700;">
+                        <i class="bi bi-geo-alt-fill me-1"></i> GOBIERNO MUNICIPAL DE TONALÁ
+                    </span>
+                    <span class="text-white-50 small">Administración 2024 - 2027</span>
+                </div>
+                <h2 class="fw-bold mb-2 text-white">
+                    ¡Bienvenido, <span th:text="${usuarioActual != null ? usuarioActual.nombre : #authentication.name}">Usuario</span>!
+                </h2>
+                <p class="mb-3 text-white-50">
+                    Sistema centralizado de generación, validación OCR y seguimiento de oficios de Visto Bueno Municipal para <strong>Ecología</strong>, <strong>Inspección y Reglamentos</strong> y <strong>Protección Civil y Bomberos</strong>.
+                </p>
+                <!-- Resumen de rol según segregación estricta de funciones -->
+                <div class="d-flex flex-wrap gap-2">
+                    <span sec:authorize="hasAnyRole('ADMIN', 'SUPER_ADMIN')" class="badge bg-dark text-white border border-secondary py-2 px-3">
+                        <i class="bi bi-tools me-1" style="color: #c59b27;"></i> Super Administrador (Mantenimiento Técnico, Cuentas y Plantillas)
+                    </span>
+                    <span sec:authorize="hasRole('SECRETARIA')" class="badge py-2 px-3" style="background-color: #212529; border: 1px solid #c59b27; color: #ffffff;">
+                        <i class="bi bi-file-earmark-person me-1" style="color: #c59b27;"></i> Operador / Secretari@ (Carga de Solicitud, OCR, Corrección y Envío)
+                    </span>
+                    <span sec:authorize="hasRole('SUPERVISOR')" class="badge bg-success text-white py-2 px-3">
+                        <i class="bi bi-patch-check-fill me-1"></i> Director / Supervisor (Evaluación y Dictamen: Aprobar o Rechazar)
+                    </span>
+                </div>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0 d-flex flex-column align-items-lg-end justify-content-center">
+                <div class="mb-2">
+                    <img th:src="@{/images/logo-tonala.png}" alt="Gobierno de Tonalá - Ciudad de la Transformación" class="bg-white rounded p-2 shadow-sm" style="max-height: 68px; width: auto; border: 2px solid #c59b27;">
+                </div>
+                <div class="p-2 px-3 bg-white bg-opacity-10 rounded border border-light border-opacity-25 d-inline-block text-start">
+                    <div class="small text-white-50 text-uppercase fw-bold" style="font-size: 0.68rem;">Sesión Activa</div>
+                    <div class="text-white fw-bold small">
+                        <i class="bi bi-person-badge me-1" style="color: #c59b27;"></i>
+                        No. Empleado: <span th:text="${#authentication.name}">ADMIN01</span>
+                    </div>
+                    <div class="small text-white-50">
+                        Rol: <span class="badge" style="background-color: #c59b27; color: #212529; font-size: 0.72rem;" th:text="${usuarioActual != null && usuarioActual.rol != null ? usuarioActual.rol.nombre : 'Usuario'}">Rol</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Título de Sección -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="fw-bold text-dark m-0"><i class="bi bi-grid-fill me-2" style="color: #822828;"></i>Módulos Operativos</h4>
+            <small class="text-muted">Acciones autorizadas para su perfil</small>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/solicitudes/nueva}" sec:authorize="hasRole('SECRETARIA')" class="btn btn-tonala-primary btn-sm">
+                <i class="bi bi-plus-circle me-1"></i> Nueva Solicitud OCR
+            </a>
+            <a th:href="@{/oficios}" class="btn btn-tonala-outline btn-sm">
+                <i class="bi bi-stoplights-fill me-1"></i> Bandeja General
+            </a>
+        </div>
+    </div>
+
+    <!-- Cuadrícula de Módulos -->
+    <div class="row g-4">
+
+        <!-- 1. CAPTURA Y OCR (Operador / Secretari@) -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card card-module">
+                <div class="card-module-header d-flex align-items-center">
+                    <div class="icon-circle-tonala">
+                        <i class="bi bi-file-earmark-arrow-up-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Captura y OCR</h5>
+                        <small class="text-white-50">Ingreso de Solicitudes</small>
+                    </div>
+                </div>
+                <div class="card-module-body">
+                    <div>
+                        <span sec:authorize="hasRole('SECRETARIA')" class="badge bg-success mb-2">
+                            <i class="bi bi-check-circle me-1"></i> Módulo Autorizado (Secretari@)
+                        </span>
+                        <span sec:authorize="hasAnyRole('ADMIN', 'SUPER_ADMIN')" class="badge bg-secondary mb-2">
+                            <i class="bi bi-lock-fill me-1"></i> Bloqueado para Administrador
+                        </span>
+                        <span sec:authorize="hasRole('SUPERVISOR')" class="badge bg-secondary mb-2">
+                            <i class="bi bi-lock-fill me-1"></i> Exclusivo Secretaría
+                        </span>
+                        <p class="text-secondary small mb-3">
+                            Cargar imagen de solicitud, extraer datos con el motor OCR y revisar/corregir manualmente antes de confirmar en base de datos.
+                        </p>
+                    </div>
+                    <div class="d-flex flex-column gap-2">
+                        <a sec:authorize="hasRole('SECRETARIA')" th:href="@{/solicitudes/nueva}" class="btn btn-tonala-primary w-100">
+                            <i class="bi bi-cloud-arrow-up me-1"></i> Subir Solicitud y Procesar OCR
+                        </a>
+                        <button sec:authorize="!hasRole('SECRETARIA')" class="btn btn-secondary disabled w-100" disabled title="Función exclusiva de Secretaría">
+                            <i class="bi bi-lock-fill me-1"></i> Subir Solicitud (Solo Secretaría)
+                        </button>
+                        <a th:href="@{/solicitudes}" class="btn btn-outline-secondary w-100 btn-sm">
+                            <i class="bi bi-list-ul me-1"></i> Ver Catálogo de Solicitudes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. SUPERVISOR: DICTAMEN DE VISTO BUENO -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card card-module">
+                <div class="card-module-header d-flex align-items-center" style="background-color: #212529;">
+                    <div class="icon-circle-tonala" style="background-color: #212529;">
+                        <i class="bi bi-clipboard2-check-fill" style="color: #c59b27;"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Dictamen de Visto Bueno</h5>
+                        <small class="text-white-50">Acción de Supervisión</small>
+                    </div>
+                </div>
+                <div class="card-module-body">
+                    <div>
+                        <span sec:authorize="hasRole('SUPERVISOR')" class="badge bg-success mb-2">
+                            <i class="bi bi-check-circle me-1"></i> Módulo Autorizado (Supervisor)
+                        </span>
+                        <span sec:authorize="!hasRole('SUPERVISOR')" class="badge bg-secondary mb-2">
+                            <i class="bi bi-lock-fill me-1"></i> Exclusivo Director/Supervisor
+                        </span>
+                        <p class="text-secondary small mb-3">
+                            Revisar expediente completo de establecimientos confirmados y emitir la resolución oficial de Visto Bueno Municipal: <strong>Aprobar o Rechazar</strong>.
+                        </p>
+                    </div>
+                    <!-- Activo solo para Supervisor -->
+                    <a sec:authorize="hasRole('SUPERVISOR')" th:href="@{/solicitudes}" class="btn btn-success w-100 fw-bold">
+                        <i class="bi bi-check2-circle me-1"></i> Evaluar Solicitudes y Dictaminar
+                    </a>
+                    <!-- Bloqueado en gris para Administrador y Secretaría -->
+                    <button sec:authorize="!hasRole('SUPERVISOR')" class="btn btn-secondary disabled w-100" disabled title="El perfil Administrador/Secretaría no puede dictaminar. Función exclusiva del Supervisor.">
+                        <i class="bi bi-lock-fill me-1"></i> Dictamen Exclusivo Supervisor
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. BANDEJA DE SEGUIMIENTO Y SEMÁFORO (3 DEPENDENCIAS) -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card card-module">
+                <div class="card-module-header d-flex align-items-center" style="background-color: #822828;">
+                    <div class="icon-circle-tonala">
+                        <i class="bi bi-stoplights-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Bandeja de Seguimiento</h5>
+                        <small class="text-white-50">Semáforo de Días Hábiles</small>
+                    </div>
+                </div>
+                <div class="card-module-body">
+                    <div>
+                        <p class="text-secondary small mb-2">
+                            Monitoreo de oficios enviados a <strong>Ecología</strong>, <strong>Reglamentos</strong> y <strong>Protección Civil</strong> con cálculo de días hábiles:
+                        </p>
+                        <div class="d-flex justify-content-between mb-3 small text-center flex-wrap gap-1">
+                            <span class="badge bg-success" title="Días 1 a 20">Verde (1-20d)</span>
+                            <span class="badge bg-warning text-dark" title="Días 21 a 29">Amarillo (21-29d)</span>
+                            <span class="badge bg-danger" title="Días 30 a 37">Rojo (30-37d)</span>
+                            <span class="badge" style="background-color: #6b21a8; color: white;" title="Día 38 en adelante">Morado (38+d)</span>
+                        </div>
+                    </div>
+                    <a th:href="@{/oficios}" class="btn btn-tonala-secondary w-100">
+                        <i class="bi bi-clock-history me-1"></i> Consultar Bandejas por Dependencia
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. PLANTILLAS EDITABLES (ADMIN) -->
+        <div sec:authorize="hasAnyRole('ADMIN', 'SUPER_ADMIN')" class="col-md-6 col-lg-4">
+            <div class="card card-module">
+                <div class="card-module-header d-flex align-items-center" style="background-color: #822828;">
+                    <div class="icon-circle-tonala">
+                        <i class="bi bi-file-earmark-code-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Plantillas de Oficios</h5>
+                        <small class="text-white-50">Editor Institucional</small>
+                    </div>
+                </div>
+                <div class="card-module-body">
+                    <div>
+                        <span class="badge mb-2" style="background-color: #c59b27; color: #212529;">
+                            <i class="bi bi-sliders me-1"></i> Administración de Textos
+                        </span>
+                        <p class="text-secondary small mb-3">
+                            Personalizar las plantillas HTML para Ecología, Inspección y Protección Civil con etiquetas dinámicas <code>{{FOLIO}}</code>, <code>{{RAZON_SOCIAL}}</code> y <code>{{DIRECCION}}</code>.
+                        </p>
+                    </div>
+                    <a th:href="@{/plantillas}" class="btn btn-tonala-primary w-100">
+                        <i class="bi bi-pencil-square me-1"></i> Administrar Plantillas
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. CATÁLOGO DE DÍAS INHÁBILES -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card card-module">
+                <div class="card-module-header d-flex align-items-center" style="background-color: #212529;">
+                    <div class="icon-circle-tonala" style="background-color: #212529;">
+                        <i class="bi bi-calendar-event-fill" style="color: #c59b27;"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Días Inhábiles</h5>
+                        <small class="text-white-50">Calendario Oficial</small>
+                    </div>
+                </div>
+                <div class="card-module-body">
+                    <div>
+                        <p class="text-secondary small mb-3">
+                            Gestión de días festivos oficiales y no laborables del Ayuntamiento de Tonalá para excluir de los plazos legales y cómputo del semáforo.
+                        </p>
+                    </div>
+                    <a th:href="@{/dias-inhabiles}" class="btn btn-outline-dark w-100">
+                        <i class="bi bi-calendar3 me-1"></i> Gestionar Calendario Inhábil
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. BITÁCORA DE AUDITORÍA -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card card-module">
+                <div class="card-module-header d-flex align-items-center" style="background-color: #212529;">
+                    <div class="icon-circle-tonala" style="background-color: #212529;">
+                        <i class="bi bi-shield-shaded" style="color: #c59b27;"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Bitácora de Auditoría</h5>
+                        <small class="text-white-50">Trazabilidad Total</small>
+                    </div>
+                </div>
+                <div class="card-module-body">
+                    <div>
+                        <p class="text-secondary small mb-3">
+                            Registro detallado e inmutable de eventos: inicios de sesión, cambios de permisos, creación de solicitudes, emisión de oficios y dictámenes.
+                        </p>
+                    </div>
+                    <a th:href="@{/auditoria}" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-journal-text me-1"></i> Ver Registros de Auditoría
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. GESTIÓN DE USUARIOS Y ROLES (ADMIN) -->
+        <div sec:authorize="hasAnyRole('ADMIN', 'SUPER_ADMIN')" class="col-md-6 col-lg-4">
+            <div class="card card-module">
+                <div class="card-module-header d-flex align-items-center" style="background-color: #822828;">
+                    <div class="icon-circle-tonala">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Usuarios y Roles</h5>
+                        <small class="text-white-50">Control de Acceso</small>
+                    </div>
+                </div>
+                <div class="card-module-body">
+                    <div>
+                        <span class="badge bg-dark text-white border border-secondary mb-2">
+                            <i class="bi bi-key-fill me-1" style="color: #c59b27;"></i> Seguridad BCrypt
+                        </span>
+                        <p class="text-secondary small mb-3">
+                            Alta de personal por número de empleado, asignación de contraseñas seguras y configuración granular de permisos por módulo.
+                        </p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/usuarios}" class="btn btn-tonala-primary flex-grow-1">
+                            <i class="bi bi-people me-1"></i> Usuarios
+                        </a>
+                        <a th:href="@{/roles}" class="btn btn-tonala-outline" title="Configurar Roles">
+                            <i class="bi bi-shield-lock me-1"></i> Roles
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<!-- Pie de Página Oficial Tonalá -->
+<div th:replace="~{fragments/navbar :: footer}"></div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
